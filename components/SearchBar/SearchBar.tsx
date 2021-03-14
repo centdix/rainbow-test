@@ -1,17 +1,7 @@
-import { FC, useEffect, useCallback, useState, useRef } from "react";
-import SearchIcon from "@material-ui/icons/Search";
-import DirecionsIcon from "@material-ui/icons/Directions";
-import MenuIcon from "@material-ui/core/Menu";
+import { FC } from "react";
 import DirectionsIcon from "@material-ui/icons/Directions";
-import {
-  InputAdornment,
-  InputBase,
-  TextField,
-  IconButton,
-  Divider,
-  Paper,
-} from "@material-ui/core";
-import { useJsApiLoader } from "@react-google-maps/api";
+import AddIcon from "@material-ui/icons/Add";
+import { TextField, IconButton } from "@material-ui/core";
 import usePlacesAutocomplete, {
   getGeocode,
   getLatLng,
@@ -21,6 +11,9 @@ import useOnclickOutside from "react-cool-onclickoutside";
 interface Props {
   className?: string;
   children?: any;
+  setStartAddress: Function;
+  setEndAddress: Function;
+  endAddresses: Array<EndAddress>;
 }
 
 const center = { lat: 48.85641, lng: 2.3488 };
@@ -31,7 +24,11 @@ const defaultBounds = {
   west: center.lng - 0.15,
 };
 
-const SearchBar: FC<Props> = ({}) => {
+const SearchBar: FC<Props> = ({
+  setStartAddress,
+  setEndAddress,
+  endAddresses,
+}) => {
   const {
     ready,
     value,
@@ -60,21 +57,21 @@ const SearchBar: FC<Props> = ({}) => {
     setValue(description, false);
     clearSuggestions();
     console.log(description);
+  };
 
-    // Get latitude and longitude via utility functions
-    getGeocode({ address: description })
-      .then((results) => getLatLng(results[0]))
-      .then(({ lat, lng }) => {
-        console.log("📍 Coordinates: ", { lat, lng });
-      })
-      .catch((error) => {
-        console.log("😱 Error: ", error);
-      });
+  const getDirections = () => {
+    value === "" ? alert("adresse non renseignée") : setStartAddress(value);
+  };
+
+  const setEndAddresses = () => {
+    let items = [...endAddresses];
+    items.push({ address: value });
+    value !== "" ? setEndAddress(items) : alert("adresse non renseignée");
   };
 
   return (
-    <div className="w-full flex flex-row items-center">
-      <div className="w-full px-2 py-4 flex-column items-center">
+    <>
+      <div className="w-full px-2 py-4 flex flex-row items-center border-b-2">
         <TextField
           variant="outlined"
           id="start-adress"
@@ -84,39 +81,46 @@ const SearchBar: FC<Props> = ({}) => {
           disabled={!ready}
           placeholder="Adresse de départ"
           className="w-11/12"
-          ref={ref}
         />
-        {status === "OK" && (
-          <ul className=" w-5/6 px-2 self-center">
-            {data.map((suggestion) => {
-              const {
-                place_id,
-                structured_formatting: { main_text, secondary_text },
-              } = suggestion;
-
-              console.log(suggestion);
-
-              return (
-                <li
-                  className="hover:bg-gray-400 cursor-pointer idItem"
-                  key={place_id}
-                  onClick={(suggestion) => handleSelect(suggestion)}
-                >
-                  <strong>{main_text}</strong> <small>{secondary_text}</small>
-                </li>
-              );
-            })}
-          </ul>
-        )}
+        <IconButton
+          color="primary"
+          className="p-4 "
+          aria-label="directions"
+          onClick={setEndAddresses}
+        >
+          <AddIcon />
+        </IconButton>
+        <IconButton
+          color="primary"
+          className="p-4 "
+          aria-label="directions"
+          onClick={getDirections}
+        >
+          <DirectionsIcon />
+        </IconButton>
       </div>
-      <IconButton
-        color="primary"
-        className="mt-5 place-self-start"
-        aria-label="directions"
-      >
-        <DirectionsIcon />
-      </IconButton>
-    </div>
+
+      {status === "OK" && (
+        <ul className=" w-5/6 px-2 absolute">
+          {data.map((suggestion) => {
+            const {
+              place_id,
+              structured_formatting: { main_text, secondary_text },
+            } = suggestion;
+            return (
+              <li
+                className="hover:bg-gray-500 cursor-pointer bg-gray-300"
+                key={place_id}
+                onClick={handleSelect(suggestion)}
+                ref={ref}
+              >
+                <strong>{main_text}</strong> <small>{secondary_text}</small>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </>
   );
 };
 

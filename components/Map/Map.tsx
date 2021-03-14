@@ -4,6 +4,7 @@ import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
 interface Props {
   className?: string;
   children?: any;
+  directions?: any;
 }
 
 const containerStyle = {
