@@ -32,11 +32,6 @@ const defaultBounds = {
 };
 
 const SearchBar: FC<Props> = ({}) => {
-  const { isLoaded } = useJsApiLoader({
-    id: "google-map-script",
-    googleMapsApiKey: "AIzaSyABF6S20JPVTeR78NHd7htMhBJ6EBqP2PE",
-  });
-
   const {
     ready,
     value,
@@ -64,6 +59,7 @@ const SearchBar: FC<Props> = ({}) => {
     // by setting the second parameter to "false"
     setValue(description, false);
     clearSuggestions();
+    console.log(description);
 
     // Get latitude and longitude via utility functions
     getGeocode({ address: description })
@@ -76,47 +72,50 @@ const SearchBar: FC<Props> = ({}) => {
       });
   };
 
-  const renderSuggestions = () =>
-    data.map((suggestion) => {
-      const {
-        place_id,
-        structured_formatting: { main_text, secondary_text },
-      } = suggestion;
-
-      return (
-        <li key={place_id} onClick={handleSelect(suggestion)}>
-          <strong>{main_text}</strong> <small>{secondary_text}</small>
-        </li>
-      );
-    });
   return (
-    <div className="w-full">
-      <Paper
-        component="form"
-        className="px-2 py-4 flex items-center w-full"
-        ref={ref}
-      >
-        <IconButton className="p-10" aria-label="menu">
-          <MenuIcon open={false} />
-        </IconButton>
+    <div className="w-full flex flex-row items-center">
+      <div className="w-full px-2 py-4 flex-column items-center">
         <TextField
           variant="outlined"
           id="start-adress"
-          value={value}
+          autoComplete="off"
           onChange={handleInput}
+          value={value}
           disabled={!ready}
           placeholder="Adresse de départ"
-          className="w-5/6"
+          className="w-11/12"
+          ref={ref}
         />
-        <IconButton
-          color="primary"
-          className="m-10 p-10"
-          aria-label="directions"
-        >
-          <DirectionsIcon />
-        </IconButton>
-      </Paper>
-      {status === "OK" && <ul>{renderSuggestions()}</ul>}
+        {status === "OK" && (
+          <ul className=" w-5/6 px-2 self-center">
+            {data.map((suggestion) => {
+              const {
+                place_id,
+                structured_formatting: { main_text, secondary_text },
+              } = suggestion;
+
+              console.log(suggestion);
+
+              return (
+                <li
+                  className="hover:bg-gray-400 cursor-pointer idItem"
+                  key={place_id}
+                  onClick={(suggestion) => handleSelect(suggestion)}
+                >
+                  <strong>{main_text}</strong> <small>{secondary_text}</small>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
+      <IconButton
+        color="primary"
+        className="mt-5 place-self-start"
+        aria-label="directions"
+      >
+        <DirectionsIcon />
+      </IconButton>
     </div>
   );
 };

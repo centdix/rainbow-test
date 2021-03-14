@@ -1,4 +1,6 @@
 import { SearchBar } from "@components/SearchBar";
+import { IconButton } from "@material-ui/core";
+import DirectionsIcon from "@material-ui/icons/Directions";
 import { FC, useRef, useEffect } from "react";
 
 interface Props {

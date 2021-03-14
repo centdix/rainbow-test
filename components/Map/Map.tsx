@@ -17,10 +17,6 @@ const center = {
 };
 
 const Map: FC<Props> = ({}) => {
-  const { isLoaded } = useJsApiLoader({
-    id: "google-map-script",
-    googleMapsApiKey: "AIzaSyABF6S20JPVTeR78NHd7htMhBJ6EBqP2PE",
-  });
   const [map, setMap] = useState(null);
   const onLoad = useCallback(function callback(map) {
     setMap(map);
@@ -29,7 +25,7 @@ const Map: FC<Props> = ({}) => {
   const onUnmount = useCallback(function callback(map) {
     setMap(null);
   }, []);
-  return isLoaded ? (
+  return (
     <GoogleMap
       mapContainerStyle={containerStyle}
       center={center}
@@ -37,8 +33,6 @@ const Map: FC<Props> = ({}) => {
       onLoad={onLoad}
       onUnmount={onUnmount}
     ></GoogleMap>
-  ) : (
-    <></>
   );
 };
 
