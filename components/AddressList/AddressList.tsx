@@ -1,13 +1,15 @@
+import { AddressItem } from "../AddressItem";
+
 interface Props {
   className?: string;
   children?: any;
   addressList: Array<EndAddress>;
+  deleteAddress: Function;
 }
 
-const AddressList = ({ addressList }) => {
-  console.log(addressList);
+const AddressList = ({ addressList, deleteAddress }) => {
   return addressList.map((address, index) => (
-    <div key={index}>{address.address}</div>
+    <AddressItem key={index} address={address} deleteAddress={deleteAddress} />
   ));
 };
 

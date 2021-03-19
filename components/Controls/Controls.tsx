@@ -15,6 +15,12 @@ const Controls: FC<Props> = ({}) => {
   const [startAddress, setStartAddress] = useState(null);
   const [endAddresses, setEndAddress] = useState(new Array<EndAddress>());
   const fetchDirections = async () => {};
+  const deleteAddress = (address) => () => {
+    console.log(address);
+    setEndAddress(
+      endAddresses.filter((addressItem) => addressItem.address !== address)
+    );
+  };
   return (
     <div
       id="controls"
@@ -25,7 +31,7 @@ const Controls: FC<Props> = ({}) => {
         endAddresses={endAddresses}
         setEndAddress={setEndAddress}
       />
-      <AddressList addressList={endAddresses} />
+      <AddressList addressList={endAddresses} deleteAddress={deleteAddress} />
     </div>
   );
 };

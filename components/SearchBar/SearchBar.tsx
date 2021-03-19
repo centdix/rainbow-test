@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import DirectionsIcon from "@material-ui/icons/Directions";
 import AddIcon from "@material-ui/icons/Add";
 import { TextField, IconButton } from "@material-ui/core";
@@ -7,6 +7,8 @@ import usePlacesAutocomplete, {
   getLatLng,
 } from "use-places-autocomplete";
 import useOnclickOutside from "react-cool-onclickoutside";
+import _uniqueId from "lodash/uniqueId";
+import newId from "../../utils/newid";
 
 interface Props {
   className?: string;
@@ -65,7 +67,9 @@ const SearchBar: FC<Props> = ({
 
   const setEndAddresses = () => {
     let items = [...endAddresses];
-    items.push({ address: value });
+    const id = newId();
+    items.push({ id: id, address: value });
+    console.log(items);
     value !== "" ? setEndAddress(items) : alert("adresse non renseignée");
   };
 
@@ -85,7 +89,7 @@ const SearchBar: FC<Props> = ({
         <IconButton
           color="primary"
           className="p-4 "
-          aria-label="directions"
+          aria-label="addtolist"
           onClick={setEndAddresses}
         >
           <AddIcon />
