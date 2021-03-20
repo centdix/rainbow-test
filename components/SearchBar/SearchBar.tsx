@@ -15,6 +15,7 @@ interface Props {
   children?: any;
   setStartAddress: Function;
   setEndAddress: Function;
+  fetchDirections: Function;
   endAddresses: Array<EndAddress>;
 }
 
@@ -30,6 +31,7 @@ const SearchBar: FC<Props> = ({
   setStartAddress,
   setEndAddress,
   endAddresses,
+  fetchDirections,
 }) => {
   const {
     ready,
@@ -62,7 +64,9 @@ const SearchBar: FC<Props> = ({
   };
 
   const getDirections = () => {
-    value === "" ? alert("adresse non renseignée") : setStartAddress(value);
+    value === ""
+      ? alert("adresse non renseignée")
+      : (setStartAddress(value), fetchDirections());
   };
 
   const setEndAddresses = () => {
@@ -75,7 +79,7 @@ const SearchBar: FC<Props> = ({
 
   return (
     <>
-      <div className="w-full px-2 py-4 flex flex-row items-center border-b-2">
+      <div className="w-full px-2 py-4 flex flex-row items-center ">
         <TextField
           variant="outlined"
           id="start-adress"

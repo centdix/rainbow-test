@@ -4,6 +4,7 @@ import DirectionsIcon from "@material-ui/icons/Directions";
 import { FC, useRef, useEffect, useState } from "react";
 import { DirectionsService } from "google-map-react";
 import { AddressList } from "../AddressList";
+import { CodeSharp, MapSharp } from "@material-ui/icons";
 
 interface Props {
   className?: string;
@@ -14,9 +15,33 @@ interface Props {
 const Controls: FC<Props> = ({}) => {
   const [startAddress, setStartAddress] = useState(null);
   const [endAddresses, setEndAddress] = useState(new Array<EndAddress>());
-  const fetchDirections = async () => {};
+
+  const fetchDirections = () => {
+    let items = [];
+    endAddresses.map((address) => {
+      const directionsService = new google.maps.DirectionsService();
+
+      const origin = startAddress;
+      const destination = address.address;
+
+      directionsService.route(
+        {
+          origin: origin,
+          destination: destination,
+          travelMode: google.maps.TravelMode.TRANSIT,
+        },
+        (result, status) => {
+          if (status === google.maps.DirectionsStatus.OK) {
+            items.push({ directions: result });
+          } else {
+            console.error(`error fetching directions ${result}`);
+          }
+        }
+      );
+    });
+    console.log(items);
+  };
   const deleteAddress = (address) => () => {
-    console.log(address);
     setEndAddress(
       endAddresses.filter((addressItem) => addressItem.address !== address)
     );
@@ -27,6 +52,7 @@ const Controls: FC<Props> = ({}) => {
       className="w-1/6 p-4 absolute left-0 top-0 bottom-0 z-10 bg-white min-w-90 lg:min-w-25 "
     >
       <SearchBar
+        fetchDirections={fetchDirections}
         setStartAddress={setStartAddress}
         endAddresses={endAddresses}
         setEndAddress={setEndAddress}
