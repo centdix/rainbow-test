@@ -11,7 +11,7 @@ interface Props {
 
 const AddressItem = ({ address, deleteAddress }) => {
   return (
-    <Paper className="flex items-center justify-between p-2 mb-1 font-thin text-sm">
+    <Paper className="flex items-center justify-between p-2 mb-1 font-thin text-sm hover:bg-gray-50 cursor-pointer">
       <p className="w-1/2 overflow-hidden">{address.address}</p>
 
       <IconButton

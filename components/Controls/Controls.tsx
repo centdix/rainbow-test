@@ -12,7 +12,7 @@ interface Props {
   setDirections: Function;
 }
 
-const Controls: FC<Props> = ({}) => {
+const Controls: FC<Props> = ({ setDirections }) => {
   const [startAddress, setStartAddress] = useState(null);
   const [endAddresses, setEndAddress] = useState(new Array<EndAddress>());
 
@@ -21,8 +21,8 @@ const Controls: FC<Props> = ({}) => {
     endAddresses.map((address) => {
       const directionsService = new google.maps.DirectionsService();
 
-      const origin = startAddress;
-      const destination = address.address;
+      const origin = address.address;
+      const destination = startAddress;
 
       directionsService.route(
         {
@@ -32,14 +32,14 @@ const Controls: FC<Props> = ({}) => {
         },
         (result, status) => {
           if (status === google.maps.DirectionsStatus.OK) {
-            items.push({ directions: result });
+            items.push(result);
           } else {
             console.error(`error fetching directions ${result}`);
           }
         }
       );
     });
-    console.log(items);
+    setDirections(items);
   };
   const deleteAddress = (address) => () => {
     setEndAddress(

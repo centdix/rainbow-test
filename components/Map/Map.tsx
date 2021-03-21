@@ -4,7 +4,7 @@ import { DirectionsRenderer, GoogleMap } from "@react-google-maps/api";
 interface Props {
   className?: string;
   children?: any;
-  directions?: any[];
+  directions?: any;
 }
 
 const containerStyle = {
@@ -17,7 +17,7 @@ const center = {
   lng: 2.2888,
 };
 
-const Map: FC<Props> = ({ directions }) => {
+const Map: FC<Props> = (directions) => {
   const [map, setMap] = useState(null);
   const onLoad = useCallback(function callback(map) {
     setMap(map);
@@ -26,16 +26,17 @@ const Map: FC<Props> = ({ directions }) => {
   const onUnmount = useCallback(function callback(map) {
     setMap(null);
   }, []);
+
+  directions && console.log(directions.directions);
   return (
     <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={13}>
-      {directions
-        ? directions.map((direction) => {
-            {
-              console.log(direction);
-            }
-            <DirectionsRenderer directions={direction} />;
-          })
-        : console.log("marche pas")}
+      {directions &&
+        directions.directions.map((route) => {
+          {
+            console.log(route);
+          }
+          <DirectionsRenderer directions={route} />;
+        })}
     </GoogleMap>
   );
 };
