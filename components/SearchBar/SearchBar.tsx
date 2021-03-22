@@ -60,7 +60,6 @@ const SearchBar: FC<Props> = ({
     // by setting the second parameter to "false"
     setValue(description, false);
     clearSuggestions();
-    console.log(description);
   };
 
   const getDirections = () => {
@@ -73,7 +72,6 @@ const SearchBar: FC<Props> = ({
     let items = [...endAddresses];
     const id = newId();
     items.push({ id: id, address: value });
-    console.log(items);
     value !== "" ? setEndAddress(items) : alert("adresse non renseignée");
   };
 

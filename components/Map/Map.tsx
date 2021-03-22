@@ -27,14 +27,10 @@ const Map: FC<Props> = (directions) => {
     setMap(null);
   }, []);
 
-  directions && console.log(directions.directions);
   return (
     <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={13}>
       {directions &&
         directions.directions.map((route) => {
-          {
-            console.log(route);
-          }
           <DirectionsRenderer directions={route} />;
         })}
     </GoogleMap>
