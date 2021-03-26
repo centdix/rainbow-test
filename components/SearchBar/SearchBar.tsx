@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useState, useContext } from "react";
 import DirectionsIcon from "@material-ui/icons/Directions";
 import AddIcon from "@material-ui/icons/Add";
 import { TextField, IconButton } from "@material-ui/core";
@@ -9,14 +9,12 @@ import usePlacesAutocomplete, {
 import useOnclickOutside from "react-cool-onclickoutside";
 import _uniqueId from "lodash/uniqueId";
 import newId from "../../utils/newid";
+import { AddressesContext } from '../../pages/index.tsx';
+import { DirectionsContext } from '../../pages/index.tsx';
 
 interface Props {
   className?: string;
   children?: any;
-  setStartAddress: Function;
-  setEndAddress: Function;
-  fetchDirections: Function;
-  endAddresses: Array<EndAddress>;
 }
 
 const center = { lat: 48.85641, lng: 2.3488 };
@@ -28,10 +26,6 @@ const defaultBounds = {
 };
 
 const SearchBar: FC<Props> = ({
-  setStartAddress,
-  setEndAddress,
-  endAddresses,
-  fetchDirections,
 }) => {
   const {
     ready,
@@ -45,6 +39,9 @@ const SearchBar: FC<Props> = ({
     },
     debounce: 300,
   });
+
+  const { addresses, setAddresses } = useContext(AddressesContext);
+  const { directions, setDirections } = useContext(DirectionsContext);
 
   const ref = useOnclickOutside(() => {
     clearSuggestions();
@@ -62,18 +59,49 @@ const SearchBar: FC<Props> = ({
     clearSuggestions();
   };
 
-  const getDirections = () => {
-    value === ""
-      ? alert("adresse non renseignée")
-      : (setStartAddress(value), fetchDirections());
+  const fetchDirections = async () => {
+    if (value === "") {
+      alert("adresse non renseignée");
+      return ;
+    }
+    let items = [];
+    await Promise.all(addresses.map(async (address) => {
+      const origin = address.address;
+      const destination = value;
+      try {
+        let result = await fetchWrapper(origin, destination);
+        items.push(result);        
+      }
+      catch (err) {
+        console.log(err);
+      }
+    }));
+    setDirections(items);
   };
 
-  const setEndAddresses = () => {
-    let items = [...endAddresses];
-    const id = newId();
-    items.push({ id: id, address: value });
-    value !== "" ? setEndAddress(items) : alert("adresse non renseignée");
-  };
+  let fetchWrapper = (origin, destination) => new Promise((resolve, reject) => {
+    const directionsService = new google.maps.DirectionsService();
+    directionsService.route({
+      origin: origin,
+      destination: destination,
+      travelMode: google.maps.TravelMode.TRANSIT,
+    }, (result, status) => {
+      if (status === google.maps.DirectionsStatus.OK)
+        resolve(result);
+      else
+        reject(new Error('fail'));
+    });
+  })
+
+  const addAddress = () => {
+    let items = [...addresses];
+    let alreadyExists = items.find((i) => i.address === value);
+    if (typeof(alreadyExists) === 'undefined') {
+      const id = newId();
+      items.push({ id: id, address: value });
+      value !== "" ? setAddresses(items) : alert("adresse non renseignée");
+    }
+  }
 
   return (
     <>
@@ -92,7 +120,7 @@ const SearchBar: FC<Props> = ({
           color="primary"
           className="p-4 "
           aria-label="addtolist"
-          onClick={setEndAddresses}
+          onClick={addAddress}
         >
           <AddIcon />
         </IconButton>
@@ -100,7 +128,7 @@ const SearchBar: FC<Props> = ({
           color="primary"
           className="p-4 "
           aria-label="directions"
-          onClick={getDirections}
+          onClick={fetchDirections}
         >
           <DirectionsIcon />
         </IconButton>
