@@ -5,7 +5,6 @@ import { DirectionsContext } from '../../pages/index.tsx';
 interface Props {
   className?: string;
   children?: any;
-  directions?: any;
 }
 
 const containerStyle = {

@@ -59,17 +59,21 @@ const SearchBar: FC<Props> = ({
     clearSuggestions();
   };
 
-  const fetchDirections = async () => {
+  const getDirections = async () => {
     if (value === "") {
       alert("adresse non renseignée");
       return ;
     }
     let items = [];
+    if (addresses.length < 1) {
+      alert('Necessite au moins une adresse dans la liste');
+      return ;
+    }
     await Promise.all(addresses.map(async (address) => {
       const origin = address.address;
       const destination = value;
       try {
-        let result = await fetchWrapper(origin, destination);
+        let result = await fetchDirection(origin, destination);
         items.push(result);        
       }
       catch (err) {
@@ -79,7 +83,7 @@ const SearchBar: FC<Props> = ({
     setDirections(items);
   };
 
-  let fetchWrapper = (origin, destination) => new Promise((resolve, reject) => {
+  let fetchDirection = (origin, destination) => new Promise((resolve, reject) => {
     const directionsService = new google.maps.DirectionsService();
     directionsService.route({
       origin: origin,
@@ -96,11 +100,14 @@ const SearchBar: FC<Props> = ({
   const addAddress = () => {
     let items = [...addresses];
     let alreadyExists = items.find((i) => i.address === value);
-    if (typeof(alreadyExists) === 'undefined') {
-      const id = newId();
-      items.push({ id: id, address: value });
-      value !== "" ? setAddresses(items) : alert("adresse non renseignée");
+
+    if (typeof(alreadyExists) !== 'undefined') {
+      alert("adresse deja renseignée");
+      return ;
     }
+    const id = newId();
+    items.push({ id: id, address: value });
+    value !== "" ? setAddresses(items) : alert("adresse non renseignée");
   }
 
   return (
@@ -128,7 +135,7 @@ const SearchBar: FC<Props> = ({
           color="primary"
           className="p-4 "
           aria-label="directions"
-          onClick={fetchDirections}
+          onClick={getDirections}
         >
           <DirectionsIcon />
         </IconButton>
